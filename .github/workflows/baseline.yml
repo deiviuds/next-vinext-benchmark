@@ -1,0 +1,170 @@
+name: Baseline benchmark
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: baseline-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      VINEXT_COMMIT: bdafcf41a77a68e5647be3f0fcf6ee4fed08ac78
+      VINEXT_PERF_RUN_KIND: main
+      VINEXT_PERF_COMMIT_SHA: bdafcf41a77a68e5647be3f0fcf6ee4fed08ac78
+      CODSPEED_SKIP_UPLOAD: "true"
+      CODSPEED_WALLTIME_PROFILER: samply
+      NEXT_TELEMETRY_DISABLED: "1"
+
+    steps:
+      - name: Checkout benchmark controller
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Checkout pristine vinext baseline
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: cloudflare/vinext
+          ref: ${{ env.VINEXT_COMMIT }}
+          path: baseline
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Record runner and baseline identity
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/results/integrity"
+          {
+            echo "ImageOS=$ImageOS"
+            echo "ImageVersion=$ImageVersion"
+            echo "RUNNER_OS=$RUNNER_OS"
+            echo "RUNNER_ARCH=$RUNNER_ARCH"
+            uname -a
+            lscpu
+            free -h
+            df -h
+          } > "$RUNNER_TEMP/results/runner.txt"
+          git -C baseline rev-parse HEAD > "$RUNNER_TEMP/results/integrity/commit-before.txt"
+          git -C baseline rev-parse 'HEAD^{tree}' > "$RUNNER_TEMP/results/integrity/tree-before.txt"
+          git -C baseline status --porcelain=v1 --untracked-files=no > "$RUNNER_TEMP/results/integrity/status-before.txt"
+          test "$(git -C baseline rev-parse HEAD)" = "$VINEXT_COMMIT"
+          test ! -s "$RUNNER_TEMP/results/integrity/status-before.txt"
+
+      - name: Set up pinned Vite+ and Node
+        uses: voidzero-dev/setup-vp@1b32467adbe183473499fd9d5d372c3ed9641754 # v1.18.0
+        with:
+          node-version: "24"
+          cache: true
+          run-install: false
+
+      - name: Install the frozen upstream dependency tree
+        working-directory: baseline
+        env:
+          npm_config_ignore_pnpmfile: "true"
+        run: vp install --frozen-lockfile --ignore-scripts
+
+      - name: Install pinned performance runner
+        shell: bash
+        run: |
+          sudo sysctl -w kernel.kptr_restrict=0
+          sudo sysctl -w kernel.perf_event_paranoid=-1
+          curl -fsSL https://github.com/CodSpeedHQ/codspeed/releases/download/v4.17.5/codspeed-runner-x86_64-unknown-linux-musl.tar.gz -o "$RUNNER_TEMP/perf-runner.tar.gz"
+          echo "88be40970bbe409192dec6f6242489ee916a4b2d8c4138b42b796853111c9b15  $RUNNER_TEMP/perf-runner.tar.gz" | sha256sum -c
+          tar -xzf "$RUNNER_TEMP/perf-runner.tar.gz" -C "$RUNNER_TEMP"
+          install -m 0755 "$RUNNER_TEMP/codspeed-runner-x86_64-unknown-linux-musl/codspeed" "$RUNNER_TEMP/codspeed"
+          echo "VINEXT_PERF_PROFILER_BIN=$RUNNER_TEMP/codspeed" >> "$GITHUB_ENV"
+
+      - name: Prepare the unmodified upstream benchmark
+        working-directory: baseline
+        env:
+          VINEXT_PERF_TARGET_ROOT: ${{ github.workspace }}/baseline
+        run: node benchmarks/perf/run-scenarios.mjs --setup-only
+
+      - name: Record exact 16.2.7 versions and dependency trees
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/results/next-16.2.7"
+          {
+            node --version
+            npm --version
+            vp --version
+            baseline/benchmarks/nextjs/node_modules/.bin/next --version
+          } > "$RUNNER_TEMP/results/next-16.2.7/versions.txt"
+          npm ls --all --json --prefix baseline/benchmarks/nextjs > "$RUNNER_TEMP/results/next-16.2.7/npm-tree.json"
+          corepack pnpm@11.1.1 --dir baseline list --recursive --depth Infinity --json > "$RUNNER_TEMP/results/next-16.2.7/workspace-tree.json"
+
+      - name: Run five rounds with Next.js 16.2.7
+        working-directory: baseline
+        env:
+          VINEXT_PERF_TARGET_ROOT: ${{ github.workspace }}/baseline
+          VINEXT_PERF_RESULTS_ROOT: ${{ runner.temp }}/results/next-16.2.7
+          VINEXT_PERF_SAMPLES: ${{ runner.temp }}/results/next-16.2.7/perf-samples.jsonl
+          VINEXT_PERF_EXECUTION_ID: ${{ github.run_id }}:${{ github.run_attempt }}:next-16.2.7
+        run: node benchmarks/perf/run-scenarios.mjs --rounds=5
+
+      - name: Normalize 16.2.7 results
+        working-directory: baseline
+        env:
+          VINEXT_PERF_EXECUTION_ID: ${{ github.run_id }}:${{ github.run_attempt }}:next-16.2.7
+        run: node benchmarks/perf/normalize-results.mjs "$RUNNER_TEMP/results/next-16.2.7/perf-samples.jsonl" "$RUNNER_TEMP/results/next-16.2.7/perf-results.json" "$RUNNER_TEMP/results/next-16.2.7/perf-profiles"
+
+      - name: Replace only the installed Next.js version with 16.3.3
+        working-directory: baseline/benchmarks/nextjs
+        run: npm install --no-save --package-lock=false --ignore-scripts next@16.3.3
+
+      - name: Record exact 16.3.3 versions and dependency trees
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/results/next-16.3.3"
+          {
+            node --version
+            npm --version
+            vp --version
+            baseline/benchmarks/nextjs/node_modules/.bin/next --version
+          } > "$RUNNER_TEMP/results/next-16.3.3/versions.txt"
+          npm ls --all --json --prefix baseline/benchmarks/nextjs > "$RUNNER_TEMP/results/next-16.3.3/npm-tree.json"
+          corepack pnpm@11.1.1 --dir baseline list --recursive --depth Infinity --json > "$RUNNER_TEMP/results/next-16.3.3/workspace-tree.json"
+
+      - name: Run five rounds with Next.js 16.3.3
+        working-directory: baseline
+        env:
+          VINEXT_PERF_TARGET_ROOT: ${{ github.workspace }}/baseline
+          VINEXT_PERF_RESULTS_ROOT: ${{ runner.temp }}/results/next-16.3.3
+          VINEXT_PERF_SAMPLES: ${{ runner.temp }}/results/next-16.3.3/perf-samples.jsonl
+          VINEXT_PERF_EXECUTION_ID: ${{ github.run_id }}:${{ github.run_attempt }}:next-16.3.3
+        run: node benchmarks/perf/run-scenarios.mjs --rounds=5
+
+      - name: Normalize 16.3.3 results
+        working-directory: baseline
+        env:
+          VINEXT_PERF_EXECUTION_ID: ${{ github.run_id }}:${{ github.run_attempt }}:next-16.3.3
+        run: node benchmarks/perf/normalize-results.mjs "$RUNNER_TEMP/results/next-16.3.3/perf-samples.jsonl" "$RUNNER_TEMP/results/next-16.3.3/perf-results.json" "$RUNNER_TEMP/results/next-16.3.3/perf-profiles"
+
+      - name: Verify tracked baseline files remain unchanged
+        if: always()
+        shell: bash
+        run: |
+          git -C baseline rev-parse HEAD > "$RUNNER_TEMP/results/integrity/commit-after.txt"
+          git -C baseline rev-parse 'HEAD^{tree}' > "$RUNNER_TEMP/results/integrity/tree-after.txt"
+          git -C baseline status --porcelain=v1 --untracked-files=no > "$RUNNER_TEMP/results/integrity/status-after.txt"
+          git -C baseline diff --binary > "$RUNNER_TEMP/results/integrity/working-tree.diff"
+          git -C baseline diff --cached --binary > "$RUNNER_TEMP/results/integrity/index.diff"
+          cmp "$RUNNER_TEMP/results/integrity/commit-before.txt" "$RUNNER_TEMP/results/integrity/commit-after.txt"
+          cmp "$RUNNER_TEMP/results/integrity/tree-before.txt" "$RUNNER_TEMP/results/integrity/tree-after.txt"
+          test ! -s "$RUNNER_TEMP/results/integrity/status-after.txt"
+          test ! -s "$RUNNER_TEMP/results/integrity/working-tree.diff"
+          test ! -s "$RUNNER_TEMP/results/integrity/index.diff"
+
+      - name: Upload raw benchmark artifacts
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: baseline-results-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/results
+          if-no-files-found: error
+          retention-days: 90
