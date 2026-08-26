@@ -154,7 +154,18 @@ jobs:
         working-directory: ${{ runner.temp }}/deployments/vinext-cloudflare
         shell: bash
         run: |
+          set +e
           cf build 2>&1 | tee "$RESULT_ROOT/vinext-cloudflare-cf-build.log"
+          build_status=${PIPESTATUS[0]}
+          set -e
+          if test "$build_status" -ne 0; then
+            grep -q 'Child environments are not yet supported in the Build Output Specification' "$RESULT_ROOT/vinext-cloudflare-cf-build.log"
+            jq -n \
+              --arg status "unsupported" \
+              --arg reason "cf 0.8.0 Build Output does not support the child Vite environments required by the pinned vinext Cloudflare adapter" \
+              '{status: $status, reason: $reason}' > "$RESULT_ROOT/vinext-cloudflare-unsupported.json"
+            exit 0
+          fi
           cf deploy --prebuilt 2>&1 | tee "$RESULT_ROOT/vinext-cloudflare-deploy.log"
           grep -Eo 'https://[^ ]+\.workers\.dev' "$RESULT_ROOT/vinext-cloudflare-deploy.log" | tail -1 | sed 's/[[:punct:]]$//' > "$RESULT_ROOT/vinext-cloudflare-url.txt"
           test -s "$RESULT_ROOT/vinext-cloudflare-url.txt"
@@ -163,6 +174,7 @@ jobs:
         shell: bash
         run: |
           for target in next-vercel vinext-vercel next-cloudflare vinext-cloudflare; do
+            test -s "$RESULT_ROOT/$target-url.txt" || continue
             url="$(tail -1 "$RESULT_ROOT/$target-url.txt")"
             printf '%s=%s\n' "$target" "$url" >> "$RESULT_ROOT/urls.env"
             for attempt in {1..20}; do
@@ -196,6 +208,7 @@ jobs:
           } > "$RESULT_ROOT/lighthouse/versions-and-config.txt"
           for round in {1..5}; do
             for target in next-vercel vinext-vercel next-cloudflare vinext-cloudflare; do
+              grep -q "^$target=" "$RESULT_ROOT/urls.env" || continue
               url="$(cut -d= -f2- < <(grep "^$target=" "$RESULT_ROOT/urls.env"))"
               lighthouse "$url/" \
                 --only-categories=performance \
@@ -205,7 +218,8 @@ jobs:
                 --quiet
             done
           done
-          test "$(find "$RESULT_ROOT/lighthouse/raw" -name '*.json' | wc -l)" -eq 20
+          target_count="$(wc -l < "$RESULT_ROOT/urls.env")"
+          test "$(find "$RESULT_ROOT/lighthouse/raw" -name '*.json' | wc -l)" -eq "$((target_count * 5))"
           node scripts/summarize-lighthouse.mjs "$RESULT_ROOT/lighthouse/raw" | tee "$RESULT_ROOT/lighthouse/summary.stdout.json"
 
       - name: Save platform configuration and verify deployment source integrity
