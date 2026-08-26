@@ -13,15 +13,19 @@ if (!source || !output || !packages) {
 }
 
 const versions = {
-  next: "16.3.3",
+  next: process.env.NEXT_VERSION,
   react: "19.2.7",
   typescript: "5.9.3",
-  openNext: "1.20.3",
+  openNext: process.env.NEXT_VERSION === "16.2.7" ? "1.20.1" : "1.20.3",
   nitro: "3.0.1-20260826-135133-65a4e394",
   cloudflareVite: "1.54.0",
   wrangler: "4.126.0",
   vitePlus: "0.2.6",
 };
+
+if (!["16.2.7", "16.3.3"].includes(versions.next)) {
+  throw new Error("NEXT_VERSION must be 16.2.7 or 16.3.3");
+}
 
 const tarball = (name) => {
   const files = JSON.parse(process.env.PACKED_FILES);
@@ -253,7 +257,7 @@ writeFileSync(
         nextVercel: "native Vercel Next.js adapter",
         nextCloudflare: `@opennextjs/cloudflare ${versions.openNext}`,
         vinextVercel: `Nitro ${versions.nitro} with the vercel preset`,
-        vinextCloudflare: `native @cloudflare/vite-plugin ${versions.cloudflareVite}`,
+        vinextCloudflare: `@vinext/cloudflare official deploy with Wrangler ${versions.wrangler}`,
       },
     },
     null,

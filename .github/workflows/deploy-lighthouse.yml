@@ -2,6 +2,14 @@ name: Deploy and Lighthouse
 
 on:
   workflow_dispatch:
+    inputs:
+      next_version:
+        description: Next.js version used by both Next.js deployments
+        required: true
+        type: choice
+        options:
+          - 16.2.7
+          - 16.3.3
 
 permissions:
   contents: read
@@ -16,6 +24,7 @@ jobs:
     timeout-minutes: 90
     env:
       VINEXT_COMMIT: bdafcf41a77a68e5647be3f0fcf6ee4fed08ac78
+      NEXT_VERSION: ${{ inputs.next_version }}
       NEXT_TELEMETRY_DISABLED: "1"
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       CF_AUTH_CONFIG: ${{ secrets.CF_AUTH_CONFIG }}
@@ -60,6 +69,7 @@ jobs:
             lscpu
             node --version
             npm --version
+            echo "Next.js=$NEXT_VERSION"
           } > "$RESULT_ROOT/runner.txt"
           git -C deployment-source rev-parse HEAD > "$RESULT_ROOT/source-commit.txt"
           git -C deployment-source rev-parse 'HEAD^{tree}' > "$RESULT_ROOT/source-tree.txt"
@@ -113,7 +123,7 @@ jobs:
       - name: Install current deployment CLIs and restore Cloudflare auth
         shell: bash
         run: |
-          npm install --global cf@0.8.0 pnpm@11.1.1 vercel@59.5.0
+          npm install --global cf@0.8.0 pnpm@11.1.1 vercel@59.7.0
           mkdir -p "$HOME/.config/cloudflare/config"
           printf '%s' "$CF_AUTH_CONFIG" > "$HOME/.config/cloudflare/config/default.json"
           chmod 600 "$HOME/.config/cloudflare/config/default.json"
@@ -163,19 +173,9 @@ jobs:
         working-directory: ${{ runner.temp }}/deployments/vinext-cloudflare
         shell: bash
         run: |
-          set +e
-          cf build 2>&1 | tee "$RESULT_ROOT/vinext-cloudflare-cf-build.log"
-          build_status=${PIPESTATUS[0]}
-          set -e
-          if test "$build_status" -ne 0; then
-            grep -q 'Child environments are not yet supported in the Build Output Specification' "$RESULT_ROOT/vinext-cloudflare-cf-build.log"
-            jq -n \
-              --arg status "unsupported" \
-              --arg reason "cf 0.8.0 Build Output does not support the child Vite environments required by the pinned vinext Cloudflare adapter" \
-              '{status: $status, reason: $reason}' > "$RESULT_ROOT/vinext-cloudflare-unsupported.json"
-            exit 0
-          fi
-          cf deploy --prebuilt 2>&1 | tee "$RESULT_ROOT/vinext-cloudflare-deploy.log"
+          rm cloudflare.config.ts wrangler.config.ts
+          export CLOUDFLARE_API_TOKEN="$(jq -r .oauth_token "$HOME/.config/cloudflare/config/default.json")"
+          corepack pnpm@11.1.1 exec vinext-cloudflare deploy 2>&1 | tee "$RESULT_ROOT/vinext-cloudflare-deploy.log"
           grep -Eo 'https://[^ ]+\.workers\.dev' "$RESULT_ROOT/vinext-cloudflare-deploy.log" | tail -1 | sed 's/[[:punct:]]$//' > "$RESULT_ROOT/vinext-cloudflare-url.txt"
           test -s "$RESULT_ROOT/vinext-cloudflare-url.txt"
 
@@ -256,7 +256,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: deployment-lighthouse-${{ github.run_id }}-${{ github.run_attempt }}
+          name: deployment-lighthouse-next-${{ env.NEXT_VERSION }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/deployment-results
           if-no-files-found: error
           retention-days: 90
