@@ -13,7 +13,7 @@ if (!source || !output || !packages) {
 }
 
 const versions = {
-  next: "16.2.7",
+  next: "16.3.3",
   react: "19.2.7",
   typescript: "5.9.3",
   openNext: "1.20.3",
