@@ -82,6 +82,7 @@ jobs:
         working-directory: ${{ runner.temp }}/deployments/vinext-cloudflare
         shell: bash
         run: |
+          export CLOUDFLARE_API_TOKEN="$(printf '%s' "$CF_AUTH_CONFIG" | jq -r .oauth_token)"
           corepack pnpm@11.1.1 exec vinext-cloudflare deploy 2>&1 | tee "$RESULT_ROOT/official-vinext-deploy.log"
           grep -Eo 'https://[^ ]+\.workers\.dev' "$RESULT_ROOT/official-vinext-deploy.log" | tail -1 | sed 's/[[:punct:]]$//' > "$RESULT_ROOT/url.txt"
           test -s "$RESULT_ROOT/url.txt"
