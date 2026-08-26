@@ -127,6 +127,7 @@ jobs:
         shell: bash
         run: |
           vercel link --yes --project next-vinext-bench-next --token "$VERCEL_TOKEN"
+          vercel pull --yes --environment=production --token "$VERCEL_TOKEN"
           vercel build --prod --token "$VERCEL_TOKEN" 2>&1 | tee "$RESULT_ROOT/next-vercel-build.log"
           vercel deploy --prebuilt --prod --token "$VERCEL_TOKEN" > "$RESULT_ROOT/next-vercel-url.txt"
 
@@ -135,6 +136,7 @@ jobs:
         shell: bash
         run: |
           vercel link --yes --project next-vinext-bench-vinext --token "$VERCEL_TOKEN"
+          vercel pull --yes --environment=production --token "$VERCEL_TOKEN"
           vercel build --prod --token "$VERCEL_TOKEN" 2>&1 | tee "$RESULT_ROOT/vinext-vercel-build.log"
           vercel deploy --prebuilt --prod --token "$VERCEL_TOKEN" > "$RESULT_ROOT/vinext-vercel-url.txt"
 
