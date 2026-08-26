@@ -19,9 +19,6 @@ jobs:
       NEXT_TELEMETRY_DISABLED: "1"
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       CF_AUTH_CONFIG: ${{ secrets.CF_AUTH_CONFIG }}
-      DEPLOYMENT_ROOT: ${{ runner.temp }}/deployments
-      PACKAGE_ROOT: ${{ runner.temp }}/packages
-      RESULT_ROOT: ${{ runner.temp }}/deployment-results
 
     steps:
       - name: Checkout benchmark controller
@@ -46,6 +43,15 @@ jobs:
       - name: Record runner and tool versions
         shell: bash
         run: |
+          DEPLOYMENT_ROOT="$RUNNER_TEMP/deployments"
+          PACKAGE_ROOT="$RUNNER_TEMP/packages"
+          RESULT_ROOT="$RUNNER_TEMP/deployment-results"
+          export DEPLOYMENT_ROOT PACKAGE_ROOT RESULT_ROOT
+          {
+            echo "DEPLOYMENT_ROOT=$DEPLOYMENT_ROOT"
+            echo "PACKAGE_ROOT=$PACKAGE_ROOT"
+            echo "RESULT_ROOT=$RESULT_ROOT"
+          } >> "$GITHUB_ENV"
           mkdir -p "$RESULT_ROOT" "$PACKAGE_ROOT"
           {
             echo "ImageOS=$ImageOS"
