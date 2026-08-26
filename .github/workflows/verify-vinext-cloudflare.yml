@@ -60,6 +60,7 @@ jobs:
           packed_files="$(find "$package_root" -maxdepth 1 -name '*.tgz' -printf '%f\n' | sort | jq -Rsc 'split("\n") | map(select(length > 0))')"
           export PACKED_FILES="$packed_files"
           export SOURCE_ROOT="$GITHUB_WORKSPACE/deployment-source"
+          export DEPLOYMENT_ROOT="$deployment_root" PACKAGE_ROOT="$package_root"
           node scripts/prepare-deployments.mjs
 
           rm "$deployment_root/vinext-cloudflare/cloudflare.config.ts"
