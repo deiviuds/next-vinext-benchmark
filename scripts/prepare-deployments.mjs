@@ -19,7 +19,7 @@ const versions = {
   openNext: "1.20.3",
   nitro: "3.0.1-20260826-135133-65a4e394",
   cloudflareVite: "1.31.0",
-  wrangler: "4.80.0",
+  wrangler: "4.125.0",
   vitePlus: "0.2.6",
 };
 
