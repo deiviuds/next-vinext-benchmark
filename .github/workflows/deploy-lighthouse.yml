@@ -144,7 +144,7 @@ jobs:
         working-directory: ${{ runner.temp }}/deployments/next-cloudflare
         shell: bash
         run: |
-          npm run build 2>&1 | tee "$RESULT_ROOT/next-cloudflare-adapter-build.log"
+          npm run build:cloudflare 2>&1 | tee "$RESULT_ROOT/next-cloudflare-adapter-build.log"
           cf build 2>&1 | tee "$RESULT_ROOT/next-cloudflare-cf-build.log"
           cf deploy --prebuilt 2>&1 | tee "$RESULT_ROOT/next-cloudflare-deploy.log"
           grep -Eo 'https://[^ ]+\.workers\.dev' "$RESULT_ROOT/next-cloudflare-deploy.log" | tail -1 | sed 's/[[:punct:]]$//' > "$RESULT_ROOT/next-cloudflare-url.txt"

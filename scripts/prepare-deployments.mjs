@@ -80,7 +80,10 @@ write("next-vercel", "package.json", {
 write("next-cloudflare", "package.json", {
   name: "vinext-benchmark-next-cloudflare",
   private: true,
-  scripts: { build: "opennextjs-cloudflare build" },
+  scripts: {
+    build: "next build --turbopack",
+    "build:cloudflare": "opennextjs-cloudflare build",
+  },
   dependencies: { next: versions.next, react: versions.react, "react-dom": versions.react },
   devDependencies: {
     "@opennextjs/cloudflare": versions.openNext,
