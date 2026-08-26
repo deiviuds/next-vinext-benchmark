@@ -110,7 +110,7 @@ write("vinext-vercel", "package.json", {
   private: true,
   type: "module",
   packageManager: "pnpm@11.1.1",
-  scripts: { build: "NITRO_PRESET=vercel vite build" },
+  scripts: { build: "NITRO_PRESET=vercel vp build" },
   dependencies: { ...vinextDependencies, nitro: `npm:nitro-nightly@${versions.nitro}` },
 });
 write(
@@ -129,7 +129,7 @@ write("vinext-cloudflare", "package.json", {
   private: true,
   type: "module",
   packageManager: "pnpm@11.1.1",
-  scripts: { build: "vite build" },
+  scripts: { build: "vp build" },
   dependencies: {
     ...vinextDependencies,
     "@cloudflare/vite-plugin": versions.cloudflareVite,
