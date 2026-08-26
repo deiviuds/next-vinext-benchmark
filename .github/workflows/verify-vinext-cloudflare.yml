@@ -1,0 +1,105 @@
+name: Verify official vinext Cloudflare deploy
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VINEXT_COMMIT: bdafcf41a77a68e5647be3f0fcf6ee4fed08ac78
+      CF_AUTH_CONFIG: ${{ secrets.CF_AUTH_CONFIG }}
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: cloudflare/vinext
+          ref: ${{ env.VINEXT_COMMIT }}
+          path: deployment-source
+          persist-credentials: false
+          fetch-depth: 1
+
+      - uses: voidzero-dev/setup-vp@1b32467adbe183473499fd9d5d372c3ed9641754 # v1.18.0
+        with:
+          node-version: "24"
+          cache: false
+          run-install: false
+
+      - name: Prepare the pinned app and official adapter
+        shell: bash
+        env:
+          npm_config_ignore_pnpmfile: "true"
+        run: |
+          package_root="$RUNNER_TEMP/packages"
+          deployment_root="$RUNNER_TEMP/deployments"
+          result_root="$RUNNER_TEMP/official-deploy-result"
+          echo "PACKAGE_ROOT=$package_root" >> "$GITHUB_ENV"
+          echo "DEPLOYMENT_ROOT=$deployment_root" >> "$GITHUB_ENV"
+          echo "RESULT_ROOT=$result_root" >> "$GITHUB_ENV"
+          mkdir -p "$package_root" "$result_root"
+
+          cd deployment-source
+          vp install --frozen-lockfile --ignore-scripts
+          git restore --source=HEAD -- pnpm-lock.yaml
+          git diff --exit-code
+          vp run build
+          for package in types vinext cloudflare; do
+            (cd "packages/$package" && vp pm pack --pack-destination "$package_root")
+          done
+          git restore --source=HEAD -- packages/vinext/README.md
+          node benchmarks/generate-app.mjs
+          git diff --exit-code
+
+          cd "$GITHUB_WORKSPACE"
+          packed_files="$(find "$package_root" -maxdepth 1 -name '*.tgz' -printf '%f\n' | sort | jq -Rsc 'split("\n") | map(select(length > 0))')"
+          export PACKED_FILES="$packed_files"
+          export SOURCE_ROOT="$GITHUB_WORKSPACE/deployment-source"
+          node scripts/prepare-deployments.mjs
+
+          rm "$deployment_root/vinext-cloudflare/cloudflare.config.ts"
+          rm "$deployment_root/vinext-cloudflare/wrangler.config.ts"
+          corepack pnpm@11.1.1 --dir "$deployment_root/vinext-cloudflare" install
+
+      - name: Restore the same OAuth login for Wrangler
+        shell: bash
+        run: |
+          mkdir -p "$HOME/.wrangler/config"
+          printf '%s' "$CF_AUTH_CONFIG" | jq -r '
+            to_entries[] |
+            select(.key == "oauth_token" or .key == "refresh_token" or .key == "expiration_time" or .key == "scopes") |
+            "\(.key) = \(.value | tojson)"
+          ' > "$HOME/.wrangler/config/default.toml"
+          chmod 600 "$HOME/.wrangler/config/default.toml"
+
+      - name: Run Cloudflare's official vinext deploy command
+        working-directory: ${{ runner.temp }}/deployments/vinext-cloudflare
+        shell: bash
+        run: |
+          corepack pnpm@11.1.1 exec vinext-cloudflare deploy 2>&1 | tee "$RESULT_ROOT/official-vinext-deploy.log"
+          grep -Eo 'https://[^ ]+\.workers\.dev' "$RESULT_ROOT/official-vinext-deploy.log" | tail -1 | sed 's/[[:punct:]]$//' > "$RESULT_ROOT/url.txt"
+          test -s "$RESULT_ROOT/url.txt"
+          curl --fail --silent --show-error --location "$(cat "$RESULT_ROOT/url.txt")/" > "$RESULT_ROOT/home.html"
+          grep -q 'Benchmark App' "$RESULT_ROOT/home.html"
+
+      - name: Verify source integrity
+        if: always()
+        shell: bash
+        run: |
+          git -C deployment-source status --porcelain=v1 --untracked-files=no > "$RESULT_ROOT/source-status.txt"
+          git -C deployment-source diff --binary > "$RESULT_ROOT/source.diff"
+          test ! -s "$RESULT_ROOT/source-status.txt"
+          test ! -s "$RESULT_ROOT/source.diff"
+
+      - name: Upload proof
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: official-vinext-cloudflare-${{ github.run_id }}
+          path: ${{ runner.temp }}/official-deploy-result
+          if-no-files-found: error
