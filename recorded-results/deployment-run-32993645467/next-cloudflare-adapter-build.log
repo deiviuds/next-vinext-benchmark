@@ -1,0 +1,91 @@
+
+> build:cloudflare
+> opennextjs-cloudflare build
+
+
+┌─────────────────────────────┐
+│ OpenNext — Cloudflare build │
+└─────────────────────────────┘
+
+App directory: /home/runner/work/_temp/deployments/next-cloudflare
+Next.js version : 16.3.3
+@opennextjs/cloudflare version: 1.20.3
+@opennextjs/aws version: 4.1.1
+workerd compatibility_date: 2026-08-26
+
+┌─────────────────────────────────┐
+│ OpenNext — Building Next.js app │
+└─────────────────────────────────┘
+
+
+> build
+> next build --turbopack
+
+▲ Next.js 16.3.3 (Turbopack)
+✓ Running next.config.ts took 23ms
+⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 5.9s
+  Skipping validation of types
+  Finished TypeScript config validation in 7ms ...
+  Collecting page data using 3 workers ...
+  Generating static pages using 3 workers (0/3) ...
+✓ Generating static pages using 3 workers (3/3) in 100ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ƒ /_not-found
+├ ƒ /about
+├ ƒ /api/data
+├ ƒ /api/health
+├ ƒ /blog
+├ ƒ /blog/[slug]
+├ ƒ /careers
+├ ƒ /changelog
+├ ƒ /community
+├ ƒ /contact
+├ ƒ /dashboard
+├ ƒ /dashboard/analytics
+├ ƒ /dashboard/settings
+├ ƒ /dashboard/users
+├ ƒ /docs
+├ ƒ /docs/[...slug]
+├ ƒ /faq
+├ ƒ /features
+├ ƒ /partners
+├ ƒ /press
+├ ƒ /pricing
+├ ƒ /privacy
+├ ƒ /products
+├ ƒ /products/[id]
+├ ƒ /roadmap
+├ ƒ /security
+├ ƒ /settings
+├ ƒ /settings/billing
+├ ƒ /settings/notifications
+├ ƒ /settings/profile
+├ ƒ /support
+├ ƒ /team
+└ ƒ /terms
+
+
+ƒ  (Dynamic)  server-rendered on demand
+
+
+┌──────────────────────────────┐
+│ OpenNext — Generating bundle │
+└──────────────────────────────┘
+
+Bundling middleware function...
+Bundling static assets...
+Bundling cache assets...
+Building server function: default...
+Applying code patches: 2.772s
+# copyPackageTemplateFiles
+[35m⚙️ Bundling the OpenNext server...
+[0m
+[35mWorker saved in `.open-next/worker.js` 🚀
+[0m
+OpenNext build complete.

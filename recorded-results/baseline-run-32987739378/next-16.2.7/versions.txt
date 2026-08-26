@@ -1,0 +1,20 @@
+v24.20.0
+11.19.0
+vp v0.3.0
+
+Local vite-plus:
+  vite-plus  Not found
+
+Tools:
+  vite             Not found
+  rolldown         Not found
+  vitest           Not found
+  oxfmt            Not found
+  oxlint           Not found
+  oxlint-tsgolint  Not found
+  tsdown           Not found
+
+Environment:
+  Package manager  Not found
+  Node.js          v24.20.0 (.session-node-version)
+Next.js v16.2.7

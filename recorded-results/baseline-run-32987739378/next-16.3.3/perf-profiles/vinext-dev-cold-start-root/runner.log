@@ -1,0 +1,114 @@
+16:23:28 [DEBUG] (1) codspeed_runner::cli::shared: codspeed v4.17.5
+16:23:28 [DEBUG] (1) codspeed_runner::cli::exec: config: OrchestratorConfig {
+    upload_url: Url {
+        scheme: "https",
+        cannot_be_a_base: false,
+        username: "",
+        password: None,
+        host: Some(
+            Domain(
+                "api.codspeed.io",
+            ),
+        ),
+        port: None,
+        path: "/upload",
+        query: None,
+        fragment: None,
+    },
+    repository_override: None,
+    working_directory: None,
+    targets: [
+        Exec {
+            command: [
+                "node",
+                "/home/runner/work/next-vinext-benchmark/next-vinext-benchmark/baseline/benchmarks/perf/cold-start.mjs",
+                "vinext",
+                "/",
+            ],
+            name: Some(
+                "vinext-dev-cold-start-root",
+            ),
+            walltime_args: WalltimeExecutionArgs {
+                warmup_time: Some(
+                    "0s",
+                ),
+                max_time: Some(
+                    "3m",
+                ),
+                min_time: None,
+                max_rounds: Some(
+                    1,
+                ),
+                min_rounds: Some(
+                    1,
+                ),
+            },
+        },
+    ],
+    modes: [
+        Walltime,
+    ],
+    instruments: Instruments {
+        mongodb: None,
+    },
+    enable_profiler: true,
+    perf_unwinding_mode: None,
+    walltime_profiler: Some(
+        Samply,
+    ),
+    simulation_tool: Callgrind,
+    profile_folder: Some(
+        "/home/runner/work/_temp/results/next-16.3.3/perf-profiles/vinext-dev-cold-start-root",
+    ),
+    skip_upload: true,
+    skip_run: false,
+    skip_setup: false,
+    allow_empty: false,
+    go_runner_version: None,
+    show_full_output: false,
+    poll_results_options: PollResultsOptions {
+        output_json: false,
+        base_run_id: None,
+    },
+    extra_env: {
+        "CODSPEED_MEMTRACK_BINARIES": "/home/runner/.local/share/vite-plus/js_runtime/node/24.20.0/bin/node",
+    },
+    fair_sched: false,
+}
+16:23:28 [DEBUG] (1) codspeed_runner::binary_installer: Found exec-harness version: 1.3.0
+16:23:28 [DEBUG] (1) codspeed_runner::binary_installer: exec-harness version 1.3.0 is already installed
+16:23:28 [DEBUG] (1) codspeed_runner::executor: Environment ready
+16:23:28 [DEBUG] (1) codspeed_runner::executor::wall_time::executor: Script not found or not a file: /usr/local/bin/codspeed-pre-bench
+16:23:28 [DEBUG] (1) codspeed_runner::executor::wall_time::executor: cmd: SAMPLY_BREAKPAD_SYMBOL_SERVER="https://symbols.mozilla.org/,https://symbols.electronjs.org/" SAMPLY_DISABLE_JIT_CLASSIFICATION="1" SAMPLY_USE_DEBUGINFOD="1" "/home/runner/work/_temp/codspeed" "samply" "record" "--presymbolicate" "--no-open" "--save-only" "--rate" "997" "-o" "/home/runner/work/_temp/results/next-16.3.3/perf-profiles/vinext-dev-cold-start-root/samply-profile.json.gz" "--" "bash" "-c" "source /tmp/.tmpRnd2Ar && bash /tmp/.tmpnHN7EJ" "bash" "/tmp/.tmpnHN7EJ"
+16:23:28 [TRACE] (1) mio::poll: [/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mio-1.2.0/src/poll.rs:576] registering event source with poller: token=Token(140409836819840), interests=WRITABLE
+16:23:28 [TRACE] (1) mio::poll: [/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mio-1.2.0/src/poll.rs:576] registering event source with poller: token=Token(140409836820224), interests=READABLE
+16:23:28 [TRACE] (3) executor: [src/executor/helpers/run_command_with_log_pipe.rs:73] [stderr]Executing: vinext-dev-cold-start-root
+
+16:23:28 [TRACE] (1) codspeed_runner::executor::shared::fifo: [src/executor/shared/fifo.rs:198] Received command: SetVersion(2)
+16:23:28 [TRACE] (1) codspeed_runner::executor::shared::fifo: [src/executor/shared/fifo.rs:198] Received command: GetIntegrationMode
+16:23:28 [TRACE] (1) codspeed_runner::executor::shared::fifo: [src/executor/shared/fifo.rs:198] Received command: SetVersion(2)
+16:23:28 [TRACE] (1) codspeed_runner::executor::shared::fifo: [src/executor/shared/fifo.rs:198] Received command: GetIntegrationMode
+16:23:28 [TRACE] (1) codspeed_runner::executor::shared::fifo: [src/executor/shared/fifo.rs:198] Received command: SetIntegration { name: "exec-harness", version: "1.3.0" }
+16:23:28 [TRACE] (1) codspeed_runner::executor::shared::fifo: [src/executor/shared/fifo.rs:198] Received command: StartProfiler
+16:23:28 [TRACE] (3) executor: [src/executor/helpers/run_command_with_log_pipe.rs:73] [stderr]Warmup done, now performing 1 rounds
+
+16:23:32 [TRACE] (2) executor: [src/executor/helpers/run_command_with_log_pipe.rs:73] {"schemaVersion":1,"benchmarkId":"vinext-dev-cold-start-root","scenarioId":"dev-cold-start-root","suite":"Development","label":"Dev server cold start","description":"Time from launching a fresh dev-server process until the root route responds, with framework caches cleared before every round.","implementationId":"vinext","implementationLabel":"vinext","profile":true,"unit":"ms","lowerIsBetter":true,"revision":"head","value":3742.304434,"measuredAt":"2026-08-26T16:23:32.728Z"}
+
+16:23:34 [TRACE] (1) codspeed_runner::executor::shared::fifo: [src/executor/shared/fifo.rs:198] Received command: AddMarker { pid: 5355, marker: RoundStart(260403710780) }
+16:23:34 [TRACE] (1) codspeed_runner::executor::shared::fifo: [src/executor/shared/fifo.rs:198] Received command: AddMarker { pid: 5355, marker: RoundEnd(266216519850) }
+16:23:34 [TRACE] (1) codspeed_runner::executor::shared::fifo: [src/executor/shared/fifo.rs:198] Received command: StopProfiler
+16:23:34 [TRACE] (1) codspeed_runner::executor::shared::fifo: [src/executor/shared/fifo.rs:198] Received command: CurrentBenchmark { pid: 5355, uri: "exec_harness::vinext-dev-cold-start-root" }
+16:23:34 [TRACE] (3) executor: [src/executor/helpers/run_command_with_log_pipe.rs:73] [stderr]Symbolicating...
+
+16:23:35 [DEBUG] (1) codspeed_runner::executor::shared::fifo: Process terminated with status: exit status: 0, stopping the command handler
+16:23:35 [TRACE] (1) mio::poll: [/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mio-1.2.0/src/poll.rs:707] deregistering event source from poller
+16:23:35 [TRACE] (1) mio::poll: [/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mio-1.2.0/src/poll.rs:707] deregistering event source from poller
+16:23:35 [DEBUG] (1) codspeed_runner::executor::wall_time::executor: cmd exit status: ExitStatus(unix_wait_status(0))
+16:23:35 [DEBUG] (1) codspeed_runner::executor::wall_time::executor: Script not found or not a file: /usr/local/bin/codspeed-post-bench
+16:23:35 [DEBUG] (1) codspeed_runner::executor: Tearing down the executor
+16:23:35 [DEBUG] (1) codspeed_runner::executor::wall_time::executor: Copying files to the profile folder
+16:23:35 [DEBUG] (1) runner_shared::artifacts: Saved ExecutionTimestamps result to "/home/runner/work/_temp/results/next-16.3.3/perf-profiles/vinext-dev-cold-start-root"
+16:23:35 [DEBUG] (1) codspeed_runner::executor::wall_time::helpers: Validating walltime results in "/home/runner/work/_temp/results/next-16.3.3/perf-profiles/vinext-dev-cold-start-root/results"
+16:23:35 [DEBUG] (1) codspeed_runner::executor::wall_time::helpers: Parsing walltime results from "/home/runner/work/_temp/results/next-16.3.3/perf-profiles/vinext-dev-cold-start-root/results/5355.json"
+16:23:35 [DEBUG] (1) codspeed_runner::executor::wall_time::helpers: Found 1 benchmark(s) in "/home/runner/work/_temp/results/next-16.3.3/perf-profiles/vinext-dev-cold-start-root/results/5355.json"
+16:23:35 [DEBUG] (1) codspeed_runner::cli::run::logger: Persisting log file to /home/runner/work/_temp/results/next-16.3.3/perf-profiles/vinext-dev-cold-start-root/runner.log

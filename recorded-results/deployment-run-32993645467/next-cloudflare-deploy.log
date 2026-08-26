@@ -1,0 +1,38 @@
+(node:4234) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/runner/work/_temp/deployments/next-cloudflare/cloudflare.config.ts?cf-no-cache=ca252ee3-947e-4c7d-8128-78943ad4c2b3 is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/runner/work/_temp/deployments/next-cloudflare/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Warning: Module type of file:///home/runner/work/_temp/deployments/next-cloudflare/cloudflare.config.ts?cf-no-cache=ca252ee3-947e-4c7d-8128-78943ad4c2b3 is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/runner/work/_temp/deployments/next-cloudflare/package.json.
+    at warnTypelessPackageJsonFile (node:internal/modules/esm/get_format:158:13)
+    at Object.getFileProtocolModuleFormat [as file:] (node:internal/modules/esm/get_format:212:7)
+    at defaultGetFormat (node:internal/modules/esm/get_format:283:36)
+    at defaultLoadSync (node:internal/modules/esm/load:161:16)
+    at #loadAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:806:12)
+    at nextStep (node:internal/modules/customization_hooks:189:26)
+    at load (file:///home/runner/.local/share/vite-plus/js_runtime/node/24.20.0/lib/node_modules/cf/dist/dist-C-6VkMPZ.mjs:134:2784)
+    at nextStep (node:internal/modules/customization_hooks:189:26)
+    at loadWithHooks (node:internal/modules/customization_hooks:374:18)
+    at #loadSync (node:internal/modules/esm/loader:829:16)
+├  Deploy
+│  🌀 Building list of assets...
+│  ✨ Read 19 files from the assets directory /home/runner/work/_temp/deployments/next-cloudflare/.cloudflare/output/v0/workers/default/assets
+│  🌀 Starting asset upload...
+│  🌀 Found 1 new or modified static asset to upload. Proceeding with upload...
+│  + /BUILD_ID
+│  Uploaded 1 of 1 asset
+│  ✨ Success! Uploaded 1 file (14 already uploaded) (0.68 sec)
+│
+│  Total Upload: 4851.25 KiB / gzip: 985.41 KiB
+│  Worker Startup Time: 30 ms
+│  Your Worker has access to the following bindings:
+│  Binding            Resource      
+│  env.ASSETS         Assets        
+│
+│  Uploaded next-vinext-bench-next (4.41 sec)
+│  Deployed next-vinext-bench-next triggers (0.64 sec)
+│    https://next-vinext-bench-next.daddias97.workers.dev
+│  Current Version ID: 776ca75c-57b9-4f1e-ad22-3aed3368a47c
+│
+◆  Deploy complete

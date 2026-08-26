@@ -1,0 +1,4 @@
+{
+  "status": "unsupported",
+  "reason": "cf 0.8.0 Build Output does not support the child Vite environments required by the pinned vinext Cloudflare adapter"
+}

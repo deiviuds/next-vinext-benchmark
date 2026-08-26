@@ -1,0 +1,16 @@
+├  Build
+│  Delegating to Vite
+file:///home/runner/work/_temp/deployments/vinext-cloudflare/node_modules/.pnpm/vinext@file+..+..+packages+vinext-1.0.0-beta.8.tgz_@vitejs+plugin-react@6.1.0_@voidzero_d033d0fc00299de4826b2008dca289e8/node_modules/vinext/dist/server/socket-error-backstop.js:186
+		throw err;
+		^
+
+Error: `viteEnvironment.childEnvironments` cannot be used together with `experimental.newConfig.cfBuildOutput`. Child environments are not yet supported in the Build Output Specification.
+    at resolvePluginConfig (file:///home/runner/work/_temp/deployments/vinext-cloudflare/node_modules/.pnpm/@cloudflare+vite-plugin@1.54.0_@voidzero-dev+vite-plus-core@0.2.6_@types+node@26.3.0_es_147a8ab06e07c074dc0b29ccf6b0c1c7/node_modules/@cloudflare/vite-plugin/dist/index.mjs:109716:105)
+    at BasicMinimalPluginContext.config (file:///home/runner/work/_temp/deployments/vinext-cloudflare/node_modules/.pnpm/@cloudflare+vite-plugin@1.54.0_@voidzero-dev+vite-plus-core@0.2.6_@types+node@26.3.0_es_147a8ab06e07c074dc0b29ccf6b0c1c7/node_modules/@cloudflare/vite-plugin/dist/index.mjs:129230:39)
+    at runConfigHook (file:///home/runner/work/_temp/deployments/vinext-cloudflare/node_modules/.pnpm/@voidzero-dev+vite-plus-core@0.2.6_@types+node@26.3.0_esbuild@0.28.1_terser@5.50.0/node_modules/@voidzero-dev/vite-plus-core/dist/vite/node/chunks/node.js:41809:42)
+    at async resolveConfig (file:///home/runner/work/_temp/deployments/vinext-cloudflare/node_modules/.pnpm/@voidzero-dev+vite-plus-core@0.2.6_@types+node@26.3.0_esbuild@0.28.1_terser@5.50.0/node_modules/@voidzero-dev/vite-plus-core/dist/vite/node/chunks/node.js:41244:11)
+    at async createBuilder (file:///home/runner/work/_temp/deployments/vinext-cloudflare/node_modules/.pnpm/@voidzero-dev+vite-plus-core@0.2.6_@types+node@26.3.0_esbuild@0.28.1_terser@5.50.0/node_modules/@voidzero-dev/vite-plus-core/dist/vite/node/chunks/node.js:39060:17)
+    at async runBuild (file:///home/runner/work/_temp/deployments/vinext-cloudflare/node_modules/.pnpm/@cloudflare+vite-plugin@1.54.0_@voidzero-dev+vite-plus-core@0.2.6_@types+node@26.3.0_es_147a8ab06e07c074dc0b29ccf6b0c1c7/node_modules/@cloudflare/vite-plugin/dist/cf-vite.mjs:158:9)
+    at async file:///home/runner/work/_temp/deployments/vinext-cloudflare/node_modules/.pnpm/@cloudflare+vite-plugin@1.54.0_@voidzero-dev+vite-plus-core@0.2.6_@types+node@26.3.0_es_147a8ab06e07c074dc0b29ccf6b0c1c7/node_modules/@cloudflare/vite-plugin/dist/cf-vite.mjs:161:18
+
+Node.js v24.20.0

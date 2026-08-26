@@ -12,3 +12,7 @@ trees, runner metadata, and Git integrity checks are uploaded as artifacts.
 Deployment projects and Lighthouse measurements are kept separate from the
 baseline workflow and its results.
 
+Read [REPORT.md](REPORT.md) for the measured medians, ranges, raw rounds,
+bundle sizes, deployment adapters, Lighthouse results, platform limitation,
+and links to the two successful public runs. Permanent copies of the complete
+run artifacts are under `recorded-results/`.

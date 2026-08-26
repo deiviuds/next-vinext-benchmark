@@ -1,0 +1,218 @@
+{
+  "next-cloudflare": {
+    "samples": [
+      {
+        "file": "next-cloudflare-round-1.json",
+        "url": "https://next-vinext-bench-next.daddias97.workers.dev/",
+        "performanceScore": 100,
+        "ttfbMs": 743,
+        "fcpMs": 957.7429999999999,
+        "lcpMs": 957.7429999999999
+      },
+      {
+        "file": "next-cloudflare-round-2.json",
+        "url": "https://next-vinext-bench-next.daddias97.workers.dev/",
+        "performanceScore": 100,
+        "ttfbMs": 828,
+        "fcpMs": 812.7365,
+        "lcpMs": 812.7365
+      },
+      {
+        "file": "next-cloudflare-round-3.json",
+        "url": "https://next-vinext-bench-next.daddias97.workers.dev/",
+        "performanceScore": 100,
+        "ttfbMs": 54,
+        "fcpMs": 798.6365,
+        "lcpMs": 798.6365
+      },
+      {
+        "file": "next-cloudflare-round-4.json",
+        "url": "https://next-vinext-bench-next.daddias97.workers.dev/",
+        "performanceScore": 100,
+        "ttfbMs": 43,
+        "fcpMs": 779.242,
+        "lcpMs": 779.242
+      },
+      {
+        "file": "next-cloudflare-round-5.json",
+        "url": "https://next-vinext-bench-next.daddias97.workers.dev/",
+        "performanceScore": 100,
+        "ttfbMs": 530,
+        "fcpMs": 792.2115,
+        "lcpMs": 792.2115
+      }
+    ],
+    "metrics": {
+      "performanceScore": {
+        "median": 100,
+        "min": 100,
+        "max": 100
+      },
+      "ttfbMs": {
+        "median": 530,
+        "min": 43,
+        "max": 828
+      },
+      "fcpMs": {
+        "median": 798.6365,
+        "min": 779.242,
+        "max": 957.7429999999999
+      },
+      "lcpMs": {
+        "median": 798.6365,
+        "min": 779.242,
+        "max": 957.7429999999999
+      }
+    },
+    "transferSample": {
+      "report": "next-cloudflare-round-1.json",
+      "totalJavaScriptBytes": 140572,
+      "totalPageBytes": 143234,
+      "documentResponseBytes": 2662
+    }
+  },
+  "next-vercel": {
+    "samples": [
+      {
+        "file": "next-vercel-round-1.json",
+        "url": "https://next-vinext-bench-next-kdh4fvc4j-ddias.vercel.app/",
+        "performanceScore": 100,
+        "ttfbMs": 13,
+        "fcpMs": 1018.5135,
+        "lcpMs": 1018.5135
+      },
+      {
+        "file": "next-vercel-round-2.json",
+        "url": "https://next-vinext-bench-next-kdh4fvc4j-ddias.vercel.app/",
+        "performanceScore": 100,
+        "ttfbMs": 14,
+        "fcpMs": 790.1425,
+        "lcpMs": 1223.1425
+      },
+      {
+        "file": "next-vercel-round-3.json",
+        "url": "https://next-vinext-bench-next-kdh4fvc4j-ddias.vercel.app/",
+        "performanceScore": 100,
+        "ttfbMs": 13,
+        "fcpMs": 786.9645,
+        "lcpMs": 786.9645
+      },
+      {
+        "file": "next-vercel-round-4.json",
+        "url": "https://next-vinext-bench-next-kdh4fvc4j-ddias.vercel.app/",
+        "performanceScore": 99,
+        "ttfbMs": 13,
+        "fcpMs": 792.894,
+        "lcpMs": 792.894
+      },
+      {
+        "file": "next-vercel-round-5.json",
+        "url": "https://next-vinext-bench-next-kdh4fvc4j-ddias.vercel.app/",
+        "performanceScore": 99,
+        "ttfbMs": 13,
+        "fcpMs": 796.3455,
+        "lcpMs": 796.3455
+      }
+    ],
+    "metrics": {
+      "performanceScore": {
+        "median": 100,
+        "min": 99,
+        "max": 100
+      },
+      "ttfbMs": {
+        "median": 13,
+        "min": 13,
+        "max": 14
+      },
+      "fcpMs": {
+        "median": 792.894,
+        "min": 786.9645,
+        "max": 1018.5135
+      },
+      "lcpMs": {
+        "median": 796.3455,
+        "min": 786.9645,
+        "max": 1223.1425
+      }
+    },
+    "transferSample": {
+      "report": "next-vercel-round-1.json",
+      "totalJavaScriptBytes": 137658,
+      "totalPageBytes": 140105,
+      "documentResponseBytes": 2447
+    }
+  },
+  "vinext-vercel": {
+    "samples": [
+      {
+        "file": "vinext-vercel-round-1.json",
+        "url": "https://next-vinext-bench-vinext-44meu3gvx-ddias.vercel.app/",
+        "performanceScore": 100,
+        "ttfbMs": 13,
+        "fcpMs": 998.606,
+        "lcpMs": 998.606
+      },
+      {
+        "file": "vinext-vercel-round-2.json",
+        "url": "https://next-vinext-bench-vinext-44meu3gvx-ddias.vercel.app/",
+        "performanceScore": 100,
+        "ttfbMs": 13,
+        "fcpMs": 811.403,
+        "lcpMs": 811.403
+      },
+      {
+        "file": "vinext-vercel-round-3.json",
+        "url": "https://next-vinext-bench-vinext-44meu3gvx-ddias.vercel.app/",
+        "performanceScore": 100,
+        "ttfbMs": 13,
+        "fcpMs": 794.971,
+        "lcpMs": 794.971
+      },
+      {
+        "file": "vinext-vercel-round-4.json",
+        "url": "https://next-vinext-bench-vinext-44meu3gvx-ddias.vercel.app/",
+        "performanceScore": 100,
+        "ttfbMs": 13,
+        "fcpMs": 799.414,
+        "lcpMs": 799.414
+      },
+      {
+        "file": "vinext-vercel-round-5.json",
+        "url": "https://next-vinext-bench-vinext-44meu3gvx-ddias.vercel.app/",
+        "performanceScore": 100,
+        "ttfbMs": 13,
+        "fcpMs": 790.777,
+        "lcpMs": 790.777
+      }
+    ],
+    "metrics": {
+      "performanceScore": {
+        "median": 100,
+        "min": 100,
+        "max": 100
+      },
+      "ttfbMs": {
+        "median": 13,
+        "min": 13,
+        "max": 13
+      },
+      "fcpMs": {
+        "median": 799.414,
+        "min": 790.777,
+        "max": 998.606
+      },
+      "lcpMs": {
+        "median": 799.414,
+        "min": 790.777,
+        "max": 998.606
+      }
+    },
+    "transferSample": {
+      "report": "vinext-vercel-round-1.json",
+      "totalJavaScriptBytes": 137827,
+      "totalPageBytes": 140631,
+      "documentResponseBytes": 2804
+    }
+  }
+}
