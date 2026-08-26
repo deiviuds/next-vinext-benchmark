@@ -122,6 +122,15 @@ jobs:
             vercel --version
           } > "$RESULT_ROOT/deployment-cli-versions.txt"
 
+      - name: Keep benchmark Vercel deployments public
+        shell: bash
+        run: |
+          for project in next-vinext-bench-next next-vinext-bench-vinext; do
+            vercel project protection disable "$project" --sso --scope ddias --token "$VERCEL_TOKEN" --json
+            vercel project protection "$project" --scope ddias --token "$VERCEL_TOKEN" --json > "$RESULT_ROOT/$project-vercel-protection.json"
+            jq -e '.ssoProtection == null' "$RESULT_ROOT/$project-vercel-protection.json"
+          done
+
       - name: Deploy Next.js to Vercel
         working-directory: ${{ runner.temp }}/deployments/next-vercel
         shell: bash
