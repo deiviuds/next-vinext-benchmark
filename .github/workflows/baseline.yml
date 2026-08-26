@@ -68,6 +68,17 @@ jobs:
           npm_config_ignore_pnpmfile: "true"
         run: vp install --frozen-lockfile --ignore-scripts
 
+      - name: Restore and verify tracked inputs before measurement
+        shell: bash
+        run: |
+          # Vite+ 0.2.6 discovers one empty fixture importer missing from the
+          # pinned lockfile. Keep the installed tree, but never benchmark with
+          # that generated lockfile change in the pristine checkout.
+          git -C baseline restore --source=HEAD -- pnpm-lock.yaml
+          git -C baseline diff --exit-code
+          git -C baseline diff --cached --exit-code
+          test -z "$(git -C baseline status --porcelain=v1 --untracked-files=no)"
+
       - name: Install pinned performance runner
         shell: bash
         run: |
@@ -95,7 +106,7 @@ jobs:
             vp --version
             baseline/benchmarks/nextjs/node_modules/.bin/next --version
           } > "$RUNNER_TEMP/results/next-16.2.7/versions.txt"
-          npm ls --all --json --prefix baseline/benchmarks/nextjs > "$RUNNER_TEMP/results/next-16.2.7/npm-tree.json"
+          npm ls --all --json --prefix baseline/benchmarks/nextjs > "$RUNNER_TEMP/results/next-16.2.7/npm-tree.json" || true
           corepack pnpm@11.1.1 --dir baseline list --recursive --depth Infinity --json > "$RUNNER_TEMP/results/next-16.2.7/workspace-tree.json"
 
       - name: Run five rounds with Next.js 16.2.7
@@ -127,7 +138,9 @@ jobs:
             vp --version
             baseline/benchmarks/nextjs/node_modules/.bin/next --version
           } > "$RUNNER_TEMP/results/next-16.3.3/versions.txt"
-          npm ls --all --json --prefix baseline/benchmarks/nextjs > "$RUNNER_TEMP/results/next-16.3.3/npm-tree.json"
+          # npm reports the intentional manifest mismatch as ELSPROBLEMS. Its
+          # JSON output records that mismatch and the complete installed tree.
+          npm ls --all --json --prefix baseline/benchmarks/nextjs > "$RUNNER_TEMP/results/next-16.3.3/npm-tree.json" || true
           corepack pnpm@11.1.1 --dir baseline list --recursive --depth Infinity --json > "$RUNNER_TEMP/results/next-16.3.3/workspace-tree.json"
 
       - name: Run five rounds with Next.js 16.3.3
