@@ -70,7 +70,11 @@ write("next-vercel", "package.json", {
   private: true,
   scripts: { build: "next build --turbopack", start: "next start" },
   dependencies: { next: versions.next, react: versions.react, "react-dom": versions.react },
-  devDependencies: { typescript: versions.typescript },
+  devDependencies: {
+    "@types/node": "25.9.2",
+    "@types/react": "19.2.16",
+    typescript: versions.typescript,
+  },
 });
 
 write("next-cloudflare", "package.json", {
@@ -80,6 +84,8 @@ write("next-cloudflare", "package.json", {
   dependencies: { next: versions.next, react: versions.react, "react-dom": versions.react },
   devDependencies: {
     "@opennextjs/cloudflare": versions.openNext,
+    "@types/node": "25.9.2",
+    "@types/react": "19.2.16",
     typescript: versions.typescript,
     wrangler: versions.wrangler,
   },
