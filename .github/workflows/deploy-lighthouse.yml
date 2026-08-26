@@ -78,6 +78,10 @@ jobs:
           for package in types vinext cloudflare; do
             (cd "packages/$package" && vp pm pack --pack-destination "$PACKAGE_ROOT")
           done
+          # vinext's prepack script intentionally replaces this tracked stub
+          # inside the deployment checkout. Preserve the packed README, then
+          # return the checkout to the pinned tree.
+          git restore --source=HEAD -- packages/vinext/README.md
           node benchmarks/generate-app.mjs
           git diff --exit-code
           test -z "$(git status --porcelain=v1 --untracked-files=no)"
