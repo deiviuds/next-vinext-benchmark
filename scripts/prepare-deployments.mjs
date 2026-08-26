@@ -107,6 +107,27 @@ write("next-cloudflare", "wrangler.jsonc", {
   assets: { binding: "ASSETS", directory: ".open-next/assets" },
   observability: { enabled: true },
 });
+write(
+  "next-cloudflare",
+  "cloudflare.config.ts",
+  `import { bindings, defineWorker } from "wrangler/experimental-config";
+import * as entrypoint from "./.open-next/worker.js" with { type: "cf-worker" };
+
+export default defineWorker({
+  name: "next-vinext-bench-next",
+  entrypoint,
+  compatibilityDate: "2026-08-26",
+  compatibilityFlags: ["nodejs_compat", "global_fetch_strictly_public"],
+  env: { ASSETS: bindings.assets() },
+  observability: { enabled: true },
+});
+`,
+);
+write(
+  "next-cloudflare",
+  "wrangler.config.ts",
+  'export default { assetsDirectory: ".open-next/assets" };\n',
+);
 
 write("vinext-vercel", "package.json", {
   name: "vinext-benchmark-vinext-vercel",
@@ -159,6 +180,28 @@ write("vinext-cloudflare", "wrangler.jsonc", {
   assets: { directory: "dist/client", not_found_handling: "none", binding: "ASSETS" },
   observability: { enabled: true },
 });
+write(
+  "vinext-cloudflare",
+  "cloudflare.config.ts",
+  `import { bindings, defineWorker } from "@cloudflare/vite-plugin/experimental-config";
+import * as entrypoint from "vinext/server/fetch-handler" with { type: "cf-worker" };
+
+export default defineWorker({
+  name: "next-vinext-bench-vinext",
+  entrypoint,
+  compatibilityDate: "2026-08-26",
+  compatibilityFlags: ["nodejs_compat"],
+  assets: { notFoundHandling: "none" },
+  env: { ASSETS: bindings.assets() },
+  observability: { enabled: true },
+});
+`,
+);
+write(
+  "vinext-cloudflare",
+  "wrangler.config.ts",
+  'export default { assetsDirectory: "dist/client" };\n',
+);
 
 const hashTree = (directory) => {
   const hash = createHash("sha256");

@@ -217,6 +217,8 @@ jobs:
             cp "$DEPLOYMENT_ROOT/$target/package.json" "$RESULT_ROOT/platform-config/$target-package.json" 2>/dev/null || true
             cp "$DEPLOYMENT_ROOT/$target/vite.config.ts" "$RESULT_ROOT/platform-config/$target-vite.config.ts" 2>/dev/null || true
             cp "$DEPLOYMENT_ROOT/$target/wrangler.jsonc" "$RESULT_ROOT/platform-config/$target-wrangler.jsonc" 2>/dev/null || true
+            cp "$DEPLOYMENT_ROOT/$target/cloudflare.config.ts" "$RESULT_ROOT/platform-config/$target-cloudflare.config.ts" 2>/dev/null || true
+            cp "$DEPLOYMENT_ROOT/$target/wrangler.config.ts" "$RESULT_ROOT/platform-config/$target-wrangler.config.ts" 2>/dev/null || true
             cp "$DEPLOYMENT_ROOT/$target/open-next.config.ts" "$RESULT_ROOT/platform-config/$target-open-next.config.ts" 2>/dev/null || true
             cp "$DEPLOYMENT_ROOT/$target/pnpm-workspace.yaml" "$RESULT_ROOT/platform-config/$target-pnpm-workspace.yaml" 2>/dev/null || true
           done
