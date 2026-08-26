@@ -99,10 +99,15 @@ jobs:
       - name: Install exact deployment trees
         shell: bash
         run: |
-          for target in next-vercel next-cloudflare vinext-vercel vinext-cloudflare; do
+          for target in next-vercel next-cloudflare; do
             npm install --ignore-scripts=false --prefix "$DEPLOYMENT_ROOT/$target"
             npm ls --all --json --prefix "$DEPLOYMENT_ROOT/$target" > "$RESULT_ROOT/$target-npm-tree.json"
             cp "$DEPLOYMENT_ROOT/$target/package-lock.json" "$RESULT_ROOT/$target-package-lock.json"
+          done
+          for target in vinext-vercel vinext-cloudflare; do
+            corepack pnpm@11.1.1 --dir "$DEPLOYMENT_ROOT/$target" install
+            corepack pnpm@11.1.1 --dir "$DEPLOYMENT_ROOT/$target" list --recursive --depth Infinity --json > "$RESULT_ROOT/$target-pnpm-tree.json"
+            cp "$DEPLOYMENT_ROOT/$target/pnpm-lock.yaml" "$RESULT_ROOT/$target-pnpm-lock.yaml"
           done
 
       - name: Install current deployment CLIs and restore Cloudflare auth
@@ -211,6 +216,7 @@ jobs:
             cp "$DEPLOYMENT_ROOT/$target/vite.config.ts" "$RESULT_ROOT/platform-config/$target-vite.config.ts" 2>/dev/null || true
             cp "$DEPLOYMENT_ROOT/$target/wrangler.jsonc" "$RESULT_ROOT/platform-config/$target-wrangler.jsonc" 2>/dev/null || true
             cp "$DEPLOYMENT_ROOT/$target/open-next.config.ts" "$RESULT_ROOT/platform-config/$target-open-next.config.ts" 2>/dev/null || true
+            cp "$DEPLOYMENT_ROOT/$target/pnpm-workspace.yaml" "$RESULT_ROOT/platform-config/$target-pnpm-workspace.yaml" 2>/dev/null || true
           done
           git -C deployment-source status --porcelain=v1 --untracked-files=no > "$RESULT_ROOT/source-status-after.txt"
           git -C deployment-source diff --binary > "$RESULT_ROOT/source-working-tree.diff"

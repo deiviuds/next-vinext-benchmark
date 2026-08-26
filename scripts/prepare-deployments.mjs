@@ -103,9 +103,15 @@ write("vinext-vercel", "package.json", {
   name: "vinext-benchmark-vinext-vercel",
   private: true,
   type: "module",
+  packageManager: "pnpm@11.1.1",
   scripts: { build: "NITRO_PRESET=vercel vite build" },
   dependencies: { ...vinextDependencies, nitro: `npm:nitro-nightly@${versions.nitro}` },
 });
+write(
+  "vinext-vercel",
+  "pnpm-workspace.yaml",
+  'peerDependencyRules:\n  allowedVersions:\n    vite: "*"\n\nallowBuilds:\n  esbuild: true\n  sharp: true\n',
+);
 write(
   "vinext-vercel",
   "vite.config.ts",
@@ -116,6 +122,7 @@ write("vinext-cloudflare", "package.json", {
   name: "vinext-benchmark-vinext-cloudflare",
   private: true,
   type: "module",
+  packageManager: "pnpm@11.1.1",
   scripts: { build: "vite build" },
   dependencies: {
     ...vinextDependencies,
@@ -124,6 +131,11 @@ write("vinext-cloudflare", "package.json", {
     wrangler: versions.wrangler,
   },
 });
+write(
+  "vinext-cloudflare",
+  "pnpm-workspace.yaml",
+  'peerDependencyRules:\n  allowedVersions:\n    vite: "*"\n\nallowBuilds:\n  esbuild: true\n  sharp: true\n  workerd: true\n',
+);
 write(
   "vinext-cloudflare",
   "vite.config.ts",
