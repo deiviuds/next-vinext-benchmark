@@ -4,8 +4,10 @@
   --faint: #9ca3af;
   --panel: #fff;
   --tab-bg: #f3f3f3;
-  --next: #f97316;
-  --vinext: #3b82f6;
+  --next: #525252;
+  --vinext: #166534;
+  --good: #166534;
+  --bad: #b91c1c;
 }
 
 * { box-sizing: border-box; }
@@ -119,17 +121,44 @@ td.framework { min-width: 160px; }
 .badge { padding: 3px 8px; border-radius: 999px; color: white; font-family: inherit; font-size: 12px; font-weight: 650; }
 .badge.next { background: var(--next); }
 .badge.vinext { background: var(--vinext); }
+.badge.good { background: var(--good); }
+.badge.bad { background: var(--bad); }
 .badge.neutral { background: #050505; }
 .metric-cell { min-width: 112px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
 .metric-cell small { display: block; margin-top: 3px; color: var(--muted); font-family: inherit; font-size: 11px; }
-.deployment-table td.scenario { min-width: 170px; }
-.deployment-table td.framework { min-width: 120px; }
+.timing-table { table-layout: fixed; }
+.timing-table th:nth-child(1), .timing-table td:nth-child(1) { width: 29%; }
+.timing-table th:nth-child(2), .timing-table td:nth-child(2) { width: 20%; }
+.timing-table th:nth-child(3), .timing-table td:nth-child(3) { width: 20%; }
+.timing-table th:nth-child(4), .timing-table td:nth-child(4) { width: 21%; }
+.timing-table th:nth-child(5), .timing-table td:nth-child(5) { width: 10%; }
+.bundle-table { table-layout: fixed; }
+.bundle-table th:nth-child(1), .bundle-table td:nth-child(1) { width: 24%; }
+.bundle-table th:nth-child(2), .bundle-table td:nth-child(2) { width: 17%; }
+.bundle-table th:nth-child(3), .bundle-table td:nth-child(3) { width: 17%; }
+.bundle-table th:nth-child(4), .bundle-table td:nth-child(4) { width: 15%; }
+.bundle-table th:nth-child(5), .bundle-table td:nth-child(5) { width: 10%; }
+.bundle-table th:nth-child(6), .bundle-table td:nth-child(6) { width: 13%; }
+.bundle-table th:nth-child(7), .bundle-table td:nth-child(7) { width: 7%; }
+.prior-cell { height: 50px; }
+.deployment-tables { display: grid; gap: 10px; }
+.deployment-table { table-layout: fixed; }
+.deployment-table th:nth-child(1), .deployment-table td:nth-child(1) { width: 20%; }
+.deployment-table th:nth-child(2), .deployment-table td:nth-child(2) { width: 19%; }
+.deployment-table td.scenario { min-width: 0; }
+.deployment-table td.framework { min-width: 0; }
+.current-badge { display: inline-block; padding: 3px 8px; border-radius: 999px; background: #ededed; color: #525252; font-size: 12px; font-weight: 650; }
+.metric-value { display: flex; align-items: center; gap: 7px; }
+.winner-mark { display: inline-block; min-width: 47px; padding: 2px 6px; border-radius: 999px; color: #fff; font-family: ui-sans-serif, system-ui, sans-serif; font-size: 10px; font-weight: 700; line-height: 1.3; text-align: center; }
+.winner-mark.next { background: var(--next); }
+.winner-mark.vinext { background: var(--vinext); }
+.winner-mark.placeholder { visibility: hidden; }
 
 .trends { margin-top: 34px; }
 .trends h2 { margin-bottom: 10px; }
 .tabs.metrics { width: 100%; }
 .tabs.metrics button { flex: 1 0 auto; }
-.tabs.datasets { width: max-content; max-width: 100%; margin-top: 8px; }
+.tabs.deployment-metrics { margin-top: 4px; }
 .chart-card { margin-top: 14px; padding: 16px; border: 1px solid var(--hairline); border-radius: 9px; background: #fff; }
 .chart-title { margin-bottom: 3px; font-size: 16px; font-weight: 550; }
 .chart-subtitle { color: var(--faint); font-size: 12px; }
@@ -137,6 +166,9 @@ td.framework { min-width: 160px; }
 .chart-wrap svg { display: block; width: 100%; height: auto; }
 .chart-legend { margin-top: 4px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 20px; color: var(--muted); font-size: 12px; }
 .legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-swatch, .legend-marker { width: 10px; height: 10px; flex: 0 0 auto; display: inline-block; }
+.legend-swatch, .legend-marker.dot { border-radius: 50%; }
+.legend-marker.triangle { clip-path: polygon(50% 0, 0 100%, 100% 100%); }
 .chart-focus { margin-top: 7px; color: var(--faint); text-align: center; font-size: 11px; }
 
 @media (max-width: 760px) {
@@ -150,4 +182,6 @@ td.framework { min-width: 160px; }
   .section-line .tabs button { flex: 1; }
   .result-title { min-width: 0; flex-wrap: wrap; gap: 8px; }
   td.scenario { min-width: 190px; }
+  .tabs.metrics { justify-content: flex-start; }
+  .tabs.metrics button { flex: 0 0 auto; }
 }

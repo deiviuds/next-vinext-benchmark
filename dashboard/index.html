@@ -72,7 +72,7 @@
           </div>
           <div class="tabs compact" data-tabs="deployment" role="tablist" aria-label="Deployment result set">
             <button type="button" role="tab" data-value="published" aria-selected="false" disabled>Published</button>
-            <button type="button" role="tab" data-value="baseline" aria-selected="true">Next 16.2.7</button>
+            <button type="button" role="tab" data-value="baseline" aria-selected="true">Our baseline</button>
             <button type="button" role="tab" data-value="updated" aria-selected="false">Next 16.3.3</button>
           </div>
         </div>
@@ -80,25 +80,10 @@
       </section>
 
       <section class="trends" aria-labelledby="trends-heading">
-        <h2 id="trends-heading">Performance Trends</h2>
-        <div class="tabs metrics" data-tabs="metrics" role="tablist" aria-label="Benchmark metric"></div>
-        <div class="tabs datasets" data-tabs="chart-dataset" role="tablist" aria-label="Focused result set">
-          <button type="button" role="tab" data-value="published" aria-selected="true">Published</button>
-          <button type="button" role="tab" data-value="baseline" aria-selected="false">Our baseline</button>
-          <button type="button" role="tab" data-value="updated" aria-selected="false">Next 16.3.3</button>
-        </div>
+        <h2 id="trends-heading">Performance &amp; deployment trends</h2>
+        <div class="tabs metrics" data-tabs="metrics" role="tablist" aria-label="Build and development metric"></div>
+        <div class="tabs metrics deployment-metrics" data-tabs="deployment-metrics" role="tablist" aria-label="Deployment metric"></div>
         <div id="chart"></div>
-      </section>
-
-      <section class="trends" aria-labelledby="deployment-trends-heading">
-        <h2 id="deployment-trends-heading">Deployment Trends</h2>
-        <div class="tabs metrics" data-tabs="deployment-metrics" role="tablist" aria-label="Deployment metric"></div>
-        <div class="tabs datasets" data-tabs="deployment-chart-dataset" role="tablist" aria-label="Focused deployment result set">
-          <button type="button" role="tab" data-value="published" aria-selected="false" disabled>Published</button>
-          <button type="button" role="tab" data-value="baseline" aria-selected="true">Next 16.2.7</button>
-          <button type="button" role="tab" data-value="updated" aria-selected="false">Next 16.3.3</button>
-        </div>
-        <div id="deployment-chart"></div>
       </section>
     </main>
   </body>
