@@ -1,0 +1,21 @@
+{
+  "name": "vinext-benchmark-vinext-vercel",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.1.1",
+  "scripts": {
+    "build": "NITRO_PRESET=vercel vp build"
+  },
+  "dependencies": {
+    "@vinext/types": "file:/home/runner/work/_temp/packages/vinext-types-1.0.0-beta.2.tgz",
+    "@vitejs/plugin-react": "6.1.0",
+    "@vitejs/plugin-rsc": "0.5.34",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "react-server-dom-webpack": "19.2.7",
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.2.6",
+    "vite-plus": "0.2.6",
+    "vinext": "file:/home/runner/work/_temp/packages/vinext-1.0.0-beta.8.tgz",
+    "nitro": "npm:nitro-nightly@3.0.1-20260826-135133-65a4e394"
+  }
+}

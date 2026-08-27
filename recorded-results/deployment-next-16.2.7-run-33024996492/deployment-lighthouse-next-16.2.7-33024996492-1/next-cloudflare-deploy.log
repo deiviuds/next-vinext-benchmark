@@ -1,0 +1,48 @@
+(node:3850) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/runner/work/_temp/deployments/next-cloudflare/cloudflare.config.ts?cf-no-cache=227e9e43-4675-4eff-9e9a-4f1e89b3f7d8 is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/runner/work/_temp/deployments/next-cloudflare/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Warning: Module type of file:///home/runner/work/_temp/deployments/next-cloudflare/cloudflare.config.ts?cf-no-cache=227e9e43-4675-4eff-9e9a-4f1e89b3f7d8 is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/runner/work/_temp/deployments/next-cloudflare/package.json.
+    at warnTypelessPackageJsonFile (node:internal/modules/esm/get_format:158:13)
+    at Object.getFileProtocolModuleFormat [as file:] (node:internal/modules/esm/get_format:212:7)
+    at defaultGetFormat (node:internal/modules/esm/get_format:283:36)
+    at defaultLoadSync (node:internal/modules/esm/load:161:16)
+    at #loadAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:806:12)
+    at nextStep (node:internal/modules/customization_hooks:189:26)
+    at load (file:///home/runner/.local/share/vite-plus/js_runtime/node/24.20.0/lib/node_modules/cf/dist/dist-C-6VkMPZ.mjs:134:2784)
+    at nextStep (node:internal/modules/customization_hooks:189:26)
+    at loadWithHooks (node:internal/modules/customization_hooks:374:18)
+    at #loadSync (node:internal/modules/esm/loader:829:16)
+├  Deploy
+│  🌀 Building list of assets...
+│  ✨ Read 20 files from the assets directory /home/runner/work/_temp/deployments/next-cloudflare/.cloudflare/output/v0/workers/default/assets
+│  🌀 Starting asset upload...
+│  🌀 Found 9 new or modified static assets to upload. Proceeding with upload...
+│  + /BUILD_ID
+│  + /_next/static/chunks/turbopack-0qebkmh13g__y.js
+│  + /_next/static/chunks/14mrh2-p_w84d.js
+│  + /_next/static/chunks/05-c3ty_6dwfk.js
+│  + /_next/static/chunks/1jq4o6yq14o4c.js
+│  + /_next/static/chunks/07u_h6i539_wj.js
+│  + /_next/static/chunks/1s8pho0d1mhn0.js
+│  + /_next/static/chunks/15orcrkp-_9ct.js
+│  + /_next/static/chunks/3n7dm2ojtyzwn.js
+│  Uploaded 3 of 9 assets
+│  Uploaded 6 of 9 assets
+│  Uploaded 9 of 9 assets
+│  ✨ Success! Uploaded 9 files (7 already uploaded) (1.04 sec)
+│
+│  Total Upload: 5455.15 KiB / gzip: 1146.29 KiB
+│  Worker Startup Time: 41 ms
+│  Your Worker has access to the following bindings:
+│  Binding            Resource      
+│  env.ASSETS         Assets        
+│
+│  Uploaded next-vinext-bench-next (5.37 sec)
+│  Deployed next-vinext-bench-next triggers (0.72 sec)
+│    https://next-vinext-bench-next.daddias97.workers.dev
+│  Current Version ID: 39d03f29-8364-4319-a994-af7997f66939
+│
+◆  Deploy complete

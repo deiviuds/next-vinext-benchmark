@@ -1,0 +1,27 @@
+{
+  "vinextCommit": "bdafcf41a77a68e5647be3f0fcf6ee4fed08ac78",
+  "appSha256": "dc4d79d3d753159972074bfa0fb745b1cd03e6ba8214633e9580470e82511847",
+  "routes": 33,
+  "appHashes": {
+    "next-vercel": "dc4d79d3d753159972074bfa0fb745b1cd03e6ba8214633e9580470e82511847",
+    "next-cloudflare": "dc4d79d3d753159972074bfa0fb745b1cd03e6ba8214633e9580470e82511847",
+    "vinext-vercel": "dc4d79d3d753159972074bfa0fb745b1cd03e6ba8214633e9580470e82511847",
+    "vinext-cloudflare": "dc4d79d3d753159972074bfa0fb745b1cd03e6ba8214633e9580470e82511847"
+  },
+  "versions": {
+    "next": "16.2.7",
+    "react": "19.2.7",
+    "typescript": "5.9.3",
+    "openNext": "1.20.1",
+    "nitro": "3.0.1-20260826-135133-65a4e394",
+    "cloudflareVite": "1.54.0",
+    "wrangler": "4.126.0",
+    "vitePlus": "0.2.6"
+  },
+  "adapters": {
+    "nextVercel": "native Vercel Next.js adapter",
+    "nextCloudflare": "@opennextjs/cloudflare 1.20.1",
+    "vinextVercel": "Nitro 3.0.1-20260826-135133-65a4e394 with the vercel preset",
+    "vinextCloudflare": "@vinext/cloudflare official deploy with Wrangler 4.126.0"
+  }
+}

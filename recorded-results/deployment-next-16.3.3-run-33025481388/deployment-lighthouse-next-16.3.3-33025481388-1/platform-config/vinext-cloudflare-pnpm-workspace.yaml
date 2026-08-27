@@ -1,0 +1,8 @@
+peerDependencyRules:
+  allowedVersions:
+    vite: "*"
+
+allowBuilds:
+  esbuild: true
+  sharp: true
+  workerd: true
