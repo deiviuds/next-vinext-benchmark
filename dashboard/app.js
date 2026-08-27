@@ -62,6 +62,27 @@ const deployments = {
   ],
 };
 
+// vinext is the same commit in both local and deployment runs. Average its
+// two measurements so the page does not present ordinary run-to-run noise as
+// a framework change. The raw reports remain unchanged in recorded-results.
+function averageSharedVinextValues(datasets, fields) {
+  const baselineRows = datasets.baseline;
+  const updatedRows = datasets.updated;
+  for (const baselineRow of baselineRows.filter((row) => row.id === "vinext")) {
+    const updatedRow = updatedRows.find((row) => row.id === "vinext" && row.scenario === baselineRow.scenario && row.platform === baselineRow.platform);
+    if (!updatedRow) continue;
+    for (const field of fields) {
+      if (typeof baselineRow[field] !== "number" || typeof updatedRow[field] !== "number") continue;
+      const average = (baselineRow[field] + updatedRow[field]) / 2;
+      baselineRow[field] = updatedRow[field] = field === "js" || field === "page" ? Math.round(average) : average;
+    }
+  }
+}
+
+averageSharedVinextValues(timing, ["median", "min", "max"]);
+averageSharedVinextValues(bundles, ["median", "min", "max"]);
+averageSharedVinextValues(deployments, ["score", "scoreMin", "scoreMax", "ttfb", "ttfbMin", "ttfbMax", "fcp", "fcpMin", "fcpMax", "lcp", "lcpMin", "lcpMax", "js", "page"]);
+
 const localMetrics = [
   { id: "client", label: "Client bundle size (gzip)", unit: "bytes", lowerIsBetter: true, values: seriesFrom("Client bundle size (gzip)") },
   { id: "entry", label: "Client entry size (gzip)", unit: "bytes", lowerIsBetter: true, values: seriesFrom("Client entry size (gzip)") },
@@ -117,27 +138,34 @@ function timingBadge(row, group) {
 }
 
 function renderTiming() {
-  const body = groups(timing[state.timing]).flatMap(([, group]) => group.map((row, index) => `
-    <tr>
+  const dataset = state.timing;
+  const previousRows = dataset === "baseline" ? timing.published : timing.baseline;
+  const previousByKey = new Map(previousRows.map((row) => [`${row.scenario}:${row.id}`, row.median]));
+  const body = groups(timing[dataset]).flatMap(([, group]) => group.map((row, index) => {
+    const previous = previousByKey.get(`${row.scenario}:${row.id}`) ?? null;
+    const percent = dataset === "published" ? null : changePercent(row.median, previous);
+    return `<tr>
       ${index === 0 ? `<td class="scenario" rowspan="${group.length}">${row.scenario}</td>` : ""}
       <td class="framework">${frameworkCell(row)}</td>
       <td><div class="value">${formatMs(row.median)}${timingBadge(row, group)}</div></td>
+      <td>${changeBadge(percent)}</td>
       <td class="muted">${formatMs(row.min)}–${formatMs(row.max)}</td>
       <td>${row.rounds}</td>
-    </tr>`)).join("");
-  document.querySelector("#timing-table").innerHTML = `<div class="table-shell"><table class="timing-table"><thead><tr><th>Scenario</th><th>Framework</th><th>Median</th><th>Range</th><th>Rounds</th></tr></thead><tbody>${body}</tbody></table></div>`;
+    </tr>`;
+  })).join("");
+  document.querySelector("#timing-table").innerHTML = `<div class="table-shell"><table class="timing-table"><thead><tr><th>Scenario</th><th>Framework</th><th>Median</th><th>Change</th><th>Range</th><th>Rounds</th></tr></thead><tbody>${body}</tbody></table></div>`;
 }
 
 function changePercent(current, previous) {
   return previous === null || previous === undefined || previous === 0 ? null : ((current - previous) / previous) * 100;
 }
 
-function changeBadge(percent, original = false) {
-  if (percent === null) return "";
+function changeBadge(percent, original = false, lowerIsBetter = true) {
+  if (percent === null) return `<span class="change-empty">—</span>`;
   const rounded = Math.abs(percent) < 0.05 ? 0 : percent;
   const sign = rounded > 0 ? "+" : "";
-  const direction = rounded === 0 ? "neutral" : rounded < 0 ? "good" : "bad";
-  return `<span class="badge ${original ? "neutral" : direction}">${sign}${rounded.toFixed(1)}%</span>`;
+  const direction = rounded === 0 ? "neutral" : lowerIsBetter ? (rounded < 0 ? "good" : "bad") : (rounded > 0 ? "good" : "bad");
+  return `<span class="badge ${direction}">${sign}${rounded.toFixed(1)}%</span>`;
 }
 
 function renderBundle() {
@@ -150,11 +178,13 @@ function renderBundle() {
     const previous = previousByKey.get(`${row.scenario}:${row.id}`) ?? null;
     const percent = original ? row.change : changePercent(row.median, previous);
     const winner = !original && group.length > 1 && group.reduce((best, item) => item.median < best.median ? item : best, group[0]) === row;
+    const other = winner ? group.find((item) => item !== row) : null;
+    const winnerAmount = winner && other ? `<span class="badge ${row.id}">${(((other.median - row.median) / other.median) * 100).toFixed(1)}% smaller</span>` : "";
     return `<tr>
       ${index === 0 ? `<td class="scenario" rowspan="${group.length}">${row.scenario}</td>` : ""}
       <td class="framework">${frameworkCell(row)}</td>
-      <td class="prior-cell">${original ? row.prior : (winner ? `<span class="badge ${row.id}">Winner</span>` : "")}</td>
-      <td class="value">${formatBytes(row.median)}</td>
+      <td class="prior-cell">${original ? row.prior : winnerAmount}</td>
+      <td class="numeric">${formatBytes(row.median)}</td>
       <td>${changeBadge(percent, original)}</td>
       <td class="muted">${formatBytes(row.min ?? row.median)}–${formatBytes(row.max ?? row.median)}</td>
       <td>${row.rounds}</td>
@@ -164,33 +194,48 @@ function renderBundle() {
   document.querySelector("#bundle-table").innerHTML = `<div class="table-shell"><table class="bundle-table"><thead><tr><th>Scenario</th><th>Framework</th><th>${original ? "Prior 10-run median" : "Winner"}</th><th>Current</th><th>Change</th><th>Range</th><th>Rounds</th></tr></thead><tbody>${body}</tbody></table></div>`;
 }
 
-function deploymentWinner(rows, metric) {
-  const best = rows.reduce((winner, row) => !winner || (metric === "score" ? row[metric] > winner[metric] : row[metric] < winner[metric]) ? row : winner, null);
-  return rows.filter((row) => row[metric] === best[metric]).length === 1 ? best : null;
+function platformCell(row) {
+  return `<div class="platform-label"><span class="platform-marker ${row.platform.toLowerCase()}"></span>${row.platform}</div>`;
+}
+
+function deploymentWinner(rows, metric, platform) {
+  const group = rows.filter((row) => row.platform === platform);
+  const best = group.reduce((winner, row) => !winner || (metric === "score" ? row[metric] > winner[metric] : row[metric] < winner[metric]) ? row : winner, null);
+  return best && group.filter((row) => row[metric] === best[metric]).length === 1 ? best : null;
 }
 
 function deploymentValue(row, metric) {
   return metric === "score" ? String(Math.round(row[metric])) : metric === "js" || metric === "page" ? formatBytes(row[metric]) : formatShortMs(row[metric]);
 }
 
-function deploymentCell(row, metric, rows) {
-  const min = row[`${metric}Min`];
-  const max = row[`${metric}Max`];
-  const range = metric === "score" ? "" : `<small>${deploymentValue({ [metric]: min }, metric)}–${deploymentValue({ [metric]: max }, metric)}</small>`;
-  const winner = deploymentWinner(rows, metric) === row ? `<span class="winner-mark ${row.id}">Winner</span>` : `<span class="winner-mark placeholder">Winner</span>`;
-  return `<td class="metric-cell"><div class="metric-value">${deploymentValue(row, metric)}${winner}</div>${range}</td>`;
+function deploymentWinnerBadge(row, metric, rows) {
+  const winner = deploymentWinner(rows, metric, row.platform);
+  if (winner !== row) return `<span class="winner-mark placeholder">Winner</span>`;
+  const other = rows.find((item) => item.platform === row.platform && item !== row);
+  const difference = metric === "score" ? ((row[metric] - other[metric]) / other[metric]) * 100 : ((other[metric] - row[metric]) / other[metric]) * 100;
+  const unit = metric === "score" ? "higher" : "smaller";
+  return `<span class="winner-mark ${row.id}">${Math.abs(difference).toFixed(1)}% ${unit}</span>`;
+}
+
+function deploymentChange(row, metric) {
+  if (state.deployment === "baseline") return null;
+  const previous = deployments.baseline.find((item) => item.platform === row.platform && item.id === row.id);
+  return changePercent(row[metric], previous?.[metric]);
+}
+
+function deploymentPair(row, metric, rows) {
+  return `<td class="metric-cell"><div class="metric-value">${deploymentValue(row, metric)}${deploymentWinnerBadge(row, metric, rows)}</div></td><td class="change-cell">${changeBadge(deploymentChange(row, metric), false, metric !== "score")}</td>`;
 }
 
 function renderDeployment() {
   const rows = deployments[state.deployment];
-  const currentLabel = state.deployment === "baseline" ? "Our baseline" : "Next 16.3.3";
-  const summary = rows.map((row) => `<tr><td class="scenario">${row.platform}</td><td class="framework">${frameworkCell(row)}</td><td><span class="current-badge">${currentLabel}</span></td>${deploymentCell(row, "score", rows)}<td>${row.rounds}</td></tr>`).join("");
-  const vitals = rows.map((row) => `<tr><td class="scenario">${row.platform}</td><td class="framework">${frameworkCell(row)}</td>${deploymentCell(row, "ttfb", rows)}${deploymentCell(row, "fcp", rows)}${deploymentCell(row, "lcp", rows)}<td>${row.rounds}</td></tr>`).join("");
-  const assets = rows.map((row) => `<tr><td class="scenario">${row.platform}</td><td class="framework">${frameworkCell(row)}</td>${deploymentCell(row, "js", rows)}${deploymentCell(row, "page", rows)}<td>${row.rounds}</td></tr>`).join("");
+  const summary = rows.map((row) => `<tr><td class="scenario">${platformCell(row)}</td><td class="framework">${frameworkCell(row)}</td>${deploymentPair(row, "score", rows)}<td>${row.rounds}</td></tr>`).join("");
+  const vitals = rows.map((row) => `<tr><td class="scenario">${platformCell(row)}</td><td class="framework">${frameworkCell(row)}</td>${deploymentPair(row, "ttfb", rows)}${deploymentPair(row, "fcp", rows)}${deploymentPair(row, "lcp", rows)}<td>${row.rounds}</td></tr>`).join("");
+  const assets = rows.map((row) => `<tr><td class="scenario">${platformCell(row)}</td><td class="framework">${frameworkCell(row)}</td>${deploymentPair(row, "js", rows)}${deploymentPair(row, "page", rows)}<td>${row.rounds}</td></tr>`).join("");
   document.querySelector("#deployment-table").innerHTML = `<div class="deployment-tables">
-    <div class="table-shell"><table class="deployment-table"><thead><tr><th>Platform</th><th>Framework</th><th>Current</th><th>Performance</th><th>Rounds</th></tr></thead><tbody>${summary}</tbody></table></div>
-    <div class="table-shell"><table class="deployment-table"><thead><tr><th>Platform</th><th>Framework</th><th>TTFB</th><th>FCP</th><th>LCP</th><th>Rounds</th></tr></thead><tbody>${vitals}</tbody></table></div>
-    <div class="table-shell"><table class="deployment-table"><thead><tr><th>Platform</th><th>Framework</th><th>Transferred JS</th><th>Page response</th><th>Rounds</th></tr></thead><tbody>${assets}</tbody></table></div>
+    <div class="table-shell"><table class="deployment-table deployment-summary"><thead><tr><th>Platform</th><th>Framework</th><th>Performance<br><small>Current</small></th><th>Change</th><th>Rounds</th></tr></thead><tbody>${summary}</tbody></table></div>
+    <div class="table-shell"><table class="deployment-table deployment-vitals"><thead><tr><th>Platform</th><th>Framework</th><th>TTFB<br><small>Current</small></th><th>Change</th><th>FCP<br><small>Current</small></th><th>Change</th><th>LCP<br><small>Current</small></th><th>Change</th><th>Rounds</th></tr></thead><tbody>${vitals}</tbody></table></div>
+    <div class="table-shell"><table class="deployment-table deployment-assets"><thead><tr><th>Platform</th><th>Framework</th><th>Transferred JS<br><small>Current</small></th><th>Change</th><th>Page response<br><small>Current</small></th><th>Change</th><th>Rounds</th></tr></thead><tbody>${assets}</tbody></table></div>
   </div>`;
 }
 
@@ -212,7 +257,7 @@ function localChart(metricData) {
   const y = (value) => 24 + 236 - ((value - min) / (max - min || 1)) * 236;
   const tick = (index) => min + ((max - min) * index) / 4;
   const grid = [0, 1, 2, 3, 4].map((index) => { const value = tick(index); const py = y(value); return `<line x1="80" y1="${py}" x2="720" y2="${py}" stroke="#e5e7eb" stroke-dasharray="5 5"/><text x="70" y="${py + 4}" text-anchor="end" fill="#9ca3af" font-size="11">${formatChartValue(value, metricData.unit)}</text>`; }).join("");
-  const series = [{ key: "next", label: "Next.js", color: "#525252" }, { key: "vinext", label: "vinext", color: "#166534" }];
+  const series = [{ key: "next", label: "Next.js", color: "#5b6169" }, { key: "vinext", label: "vinext", color: "#2f855a" }];
   const lines = series.map((item) => {
     const path = metricData.values.map((point, index) => point[item.key] === null ? null : `${index === 0 || metricData.values[index - 1][item.key] === null ? "M" : "L"} ${x[index]} ${y(point[item.key])}`).filter(Boolean).join(" ");
     const markers = metricData.values.map((point, index) => point[item.key] === null ? "" : `<circle cx="${x[index]}" cy="${y(point[item.key])}" r="4.5" fill="${item.color}" stroke="white" stroke-width="2"><title>${datasetLabels[index]} · ${item.label}: ${formatChartValue(point[item.key], metricData.unit)}</title></circle>`).join("");
@@ -225,10 +270,10 @@ function localChart(metricData) {
 
 function deploymentChart(metricData) {
   const targets = [
-    { id: "next", platform: "Cloudflare", label: "Next.js · Cloudflare", color: "#525252", shape: "dot", dash: "" },
-    { id: "vinext", platform: "Cloudflare", label: "vinext · Cloudflare", color: "#166534", shape: "dot", dash: "" },
-    { id: "next", platform: "Vercel", label: "Next.js · Vercel", color: "#525252", shape: "triangle", dash: "6 5" },
-    { id: "vinext", platform: "Vercel", label: "vinext · Vercel", color: "#166534", shape: "triangle", dash: "6 5" },
+    { id: "next", platform: "Cloudflare", label: "Next.js · Cloudflare", color: "#5b6169", shape: "dot", dash: "" },
+    { id: "vinext", platform: "Cloudflare", label: "vinext · Cloudflare", color: "#2f855a", shape: "dot", dash: "" },
+    { id: "next", platform: "Vercel", label: "Next.js · Vercel", color: "#5b6169", shape: "triangle", dash: "6 5" },
+    { id: "vinext", platform: "Vercel", label: "vinext · Vercel", color: "#2f855a", shape: "triangle", dash: "6 5" },
   ];
   const values = ["baseline", "updated"].map((dataset) => targets.map((target) => deployments[dataset].find((row) => row.id === target.id && row.platform === target.platform)[metricData.id]));
   const all = values.flat();
